@@ -1,5 +1,7 @@
+import 'package:final_project/models/player.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/services/auth_service.dart';
+import 'package:final_project/services/player_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -11,13 +13,15 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+
   final AuthService _authservice = AuthService();
+  final PlayerService _playerService = PlayerService();
 
   bool hiddenContent = true;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  // final TextEditingController _userController = TextEditingController();
+  final TextEditingController _userController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -56,21 +60,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         if (!value.contains("@") || !value.contains(".")) {
                           return "Invalid email";
                         }
+                        return null;
+
                       },
                       decoration: InputDecoration(
                         labelText: "Email",
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    // SizedBox(height:20),
-                    // TextFormField(
-                    //   controller: _userController,
-                    //   decoration: InputDecoration(
-                    //     labelText: "Username",
-                    //     border: OutlineInputBorder()
-                    //   ),
+                    SizedBox(height:20),
+                    TextFormField(
+                      controller: _userController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter a username";
+                        }
+                         if (value.length < 6) {
+                          return "username is too short";
+                        }
+                        return null;
+                        
+                        },
+                      decoration: InputDecoration(
+                        labelText: "Username",
+                        border: OutlineInputBorder()
+                      ),
 
-                    // ),
+                    ),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: _passController,
@@ -83,6 +99,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         if (value.length < 6) {
                           return "Password must be at least 6 characters";
                         }
+                        return null;
+
                       },
                       decoration: InputDecoration(
                         labelText: "Password",
@@ -110,7 +128,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             password: _passController.text,
                           );
 
+
+
                           if(result != null){
+                           await _playerService.createUser(result.user!.uid, Player(username: _userController.text));
                           Navigator.pushReplacementNamed(
                           context,
                           RouteName.homeRouteName,

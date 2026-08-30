@@ -56,6 +56,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         if (!value.contains("@") || !value.contains(".")) {
                           return "Invalid email";
                         }
+                        return null;
                       },
                             decoration: InputDecoration(
                               labelText: "Email",
@@ -75,6 +76,8 @@ class _LogInScreenState extends State<LogInScreen> {
                         if (value.length < 6) {
                           return "Password must be at least 6 characters";
                         }
+                        return null;
+
                       },
                             decoration: InputDecoration(
                               labelText: "Password",
@@ -104,9 +107,9 @@ class _LogInScreenState extends State<LogInScreen> {
                         }
                         
                       },
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 255, 215, 0))
-                            ),
+                            // style: ButtonStyle(
+                            //   backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 255, 215, 0))
+                            // ),
                            child: SizedBox(
                             width: 50,
                             height: 50,
