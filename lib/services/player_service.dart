@@ -38,25 +38,25 @@ class PlayerService{
     }
   }
 
-  Future<void> updateWins(String uid , int wins) async{
+  Future<void> updateWins(String uid ) async{
     try{
-      await _instance.collection("players").doc(uid).update({"wins":wins});
+      await _instance.collection("players").doc(uid).update({"wins":FieldValue.increment(1)});
     }
     catch (e){
       print(e);
     }
   } 
-  Future<void> updateLoses(String uid , int loses) async{
+  Future<void> updateLoses(String uid) async{
     try{
-      await _instance.collection("players").doc(uid).update({"loses":loses});
+      await _instance.collection("players").doc(uid).update({"loses":FieldValue.increment(1)});
     }
     catch (e){
       print(e);
     }
   } 
-  Future<void> updateDraws(String uid , int draws) async{
+  Future<void> updateDraws(String uid ) async{
     try{
-      await _instance.collection("players").doc(uid).update({"draws":draws});
+      await _instance.collection("players").doc(uid).update({"draws":FieldValue.increment(1)});
     }
     catch (e){
       print(e);

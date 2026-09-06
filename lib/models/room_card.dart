@@ -44,7 +44,7 @@ class RoomCard extends StatelessWidget {
 
                 _roomService.updateOpponentId(roomId, opponentId);
                 _roomService.updateOpponentName(roomId, opponent!.username);
-                _roomService.updateRoomState(roomId,RoomState.playing);
+                _roomService.updateRoomState(roomId,RoomState.ready);
 
                 Navigator.pushNamed(
                   context,

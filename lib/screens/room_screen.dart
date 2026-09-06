@@ -1,4 +1,5 @@
 import 'package:final_project/models/room.dart';
+import 'package:final_project/models/room_state_enum.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/services/auth_service.dart';
 import 'package:final_project/services/room_service.dart';
@@ -30,6 +31,14 @@ class _RoomScreenState extends State<RoomScreen> {
         }
         if (snapshot.hasData) {
           final room = snapshot.data!;
+          if (room.roomState == RoomState.playing &&
+              _authService.getUid() == room.opponentId) {
+            WidgetsBinding.instance.addPostFrameCallback((_){Navigator.pushNamed(
+              context,
+              RouteName.gameRouteName,
+              arguments: roomId,
+            );});
+          }
           return Scaffold(
             appBar: AppBar(title: Text("Game Room")),
             body: Center(
@@ -97,12 +106,17 @@ class _RoomScreenState extends State<RoomScreen> {
                     onPressed:
                         _authService.getUid() == room.creatorId &&
                             room.opponentId != null
-                        ? () {
+                        ? () async {
+                            await _roomService.updateRoomState(
+                              roomId,
+                              RoomState.playing,
+                            );
                             Navigator.pushNamed(
                               context,
                               RouteName.gameRouteName,
-                              arguments: roomId
+                              arguments: roomId,
                             );
+                            await _roomService.updateTurnStartAt(roomId);
                           }
                         : null,
                     style: ElevatedButton.styleFrom(minimumSize: Size(200, 60)),
@@ -118,3 +132,5 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 }
+
+

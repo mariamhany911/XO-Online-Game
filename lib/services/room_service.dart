@@ -13,6 +13,11 @@ class RoomService {
         'opponentName': room.opponentName,
         'opponentId': room.opponentId,
         'roomState': room.roomState.name,
+        'xTurn':room.xTurn,
+        'board':room.board,
+        'winnerId':room.winnerId,
+        'updateStat':room.updateStat,
+        'turnStartAt':room.turnStartAt
       });
       return result.id;
     } catch (e) {
@@ -59,7 +64,8 @@ class RoomService {
     }
   }
 
-  Future<void> updateRoomState(String roomId, RoomState roomState) async {
+  Future<void> updateRoomState(String roomId, RoomState roomState) async
+   {
     try {
       await _instance.collection("rooms").doc(roomId).update({
         "roomState": roomState.name,
@@ -72,7 +78,7 @@ class RoomService {
   Future<List<Room>> getAvailableRooms() async {
     final snapshot = await _instance
         .collection("rooms")
-        .where('roomState', whereIn: ["waiting", "playing"])
+        .where('roomState', whereIn: ["waiting", "playing","ready"])
         .get();
     List<Room> availableRooms = [];
     for (final doc in snapshot.docs) {
@@ -101,8 +107,58 @@ class RoomService {
         creatorId: doc["creatorId"],
         opponentName: doc["opponentName"],
         opponentId: doc["opponentId"],
-        roomState: RoomState.values.byName(doc["roomState"])
+        roomState: RoomState.values.byName(doc["roomState"]),
+        xTurn: doc["xTurn"],
+        board: List<String> .from(doc["board"]),
+        winnerId: doc["winnerId"],
+        updateStat:doc["updateStat"],
+        turnStartAt:doc["turnStartAt"]
+
         );
         });
+  }
+
+  Future<void> updateGame(String roomId ,bool xTurn , List<String> board) async{
+    try{
+      await _instance.collection("rooms").doc(roomId).update({
+        "board":board,
+        "xTurn":xTurn,
+        "turnStartAt":Timestamp.now()
+        });
+    }
+    catch (e){
+      print(e);
+    }
+  }
+  Future<void> updateWinner(String roomId , String winnerId) async{
+    try{
+      await _instance.collection("rooms").doc(roomId).update({
+        "winnerId":winnerId
+      });
+    }
+    catch (e){
+      print(e);
+    }
+  }
+
+  Future<void> updateStat(String roomId) async {
+  try {
+    await _instance.collection("rooms").doc(roomId).update({
+      "updateStat": true,
+    });
+  } catch (e) {
+    print(e);
+  }
+}
+
+  Future<void> updateTurnStartAt(String roomId)async{
+    try{
+        await _instance.collection("rooms").doc(roomId).update({
+            "turnStartAt":Timestamp.now()
+        });
+    }
+    catch(e){
+        print(e);
+    }
   }
 }
