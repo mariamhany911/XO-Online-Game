@@ -1,8 +1,12 @@
+import 'package:final_project/constants/colors.dart';
 import 'package:final_project/firebase_options.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+  final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
+  final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,19 +17,43 @@ void main() async{
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final myPurple = Color.fromARGB(255, 176, 38, 255);
-    final myYellow = Color.fromARGB(255, 255, 215, 0);
-    return MaterialApp(
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentMode, _) {
+     return MaterialApp(
+      scaffoldMessengerKey:scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.dark,
+        themeMode: currentMode,
+
+         theme: ThemeData.light().copyWith(
+            scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(backgroundColor:Colors.white),
+            colorScheme: ColorScheme.light(
+              primary: myPurple,
+              secondary: myYellow,
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: myYellow,
+                foregroundColor: myPurple,
+              ),
+            ),
+            textTheme: ThemeData.light().textTheme.apply(
+              bodyColor: Colors.black,
+              displayColor: Colors.black,
+            ),
+          ),
+
 
         darkTheme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: Colors.black,
-
+          appBarTheme: AppBarTheme(backgroundColor:Colors.black),
           colorScheme: ColorScheme.dark(
             primary: myPurple,
             secondary: myYellow
@@ -46,5 +74,6 @@ class MyApp extends StatelessWidget {
         routes: AppRoutes.routes,
         initialRoute: RouteName.initRouteName,
     );
+  });
 }
 }

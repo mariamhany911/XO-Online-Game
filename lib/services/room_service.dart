@@ -13,11 +13,11 @@ class RoomService {
         'opponentName': room.opponentName,
         'opponentId': room.opponentId,
         'roomState': room.roomState.name,
-        'xTurn':room.xTurn,
-        'board':room.board,
-        'winnerId':room.winnerId,
-        'updateStat':room.updateStat,
-        'turnStartAt':room.turnStartAt
+        'xTurn': room.xTurn,
+        'board': room.board,
+        'winnerId': room.winnerId,
+        'updateStat': room.updateStat,
+        'turnStartAt': room.turnStartAt,
       });
       return result.id;
     } catch (e) {
@@ -44,7 +44,7 @@ class RoomService {
     }
   }
 
-  Future<void> updateOpponentName(String roomId, String opponentName) async {
+  Future<void> updateOpponentName(String roomId, String? opponentName) async {
     try {
       await _instance.collection("rooms").doc(roomId).update({
         "opponentName": opponentName,
@@ -54,7 +54,7 @@ class RoomService {
     }
   }
 
-  Future<void> updateOpponentId(String roomId, String opponentId) async {
+  Future<void> updateOpponentId(String roomId, String? opponentId) async {
     try {
       await _instance.collection("rooms").doc(roomId).update({
         "opponentId": opponentId,
@@ -64,8 +64,7 @@ class RoomService {
     }
   }
 
-  Future<void> updateRoomState(String roomId, RoomState roomState) async
-   {
+  Future<void> updateRoomState(String roomId, RoomState roomState) async {
     try {
       await _instance.collection("rooms").doc(roomId).update({
         "roomState": roomState.name,
@@ -75,90 +74,95 @@ class RoomService {
     }
   }
 
-  Future<List<Room>> getAvailableRooms() async {
-    final snapshot = await _instance
+  Stream<List<Room>> getAvailableRooms() {
+    return _instance
         .collection("rooms")
-        .where('roomState', whereIn: ["waiting", "playing","ready"])
-        .get();
-    List<Room> availableRooms = [];
-    for (final doc in snapshot.docs) {
-      final room = Room(
-        roomId: doc.id,
-        creatorName: doc["creatorName"],
-        creatorId: doc["creatorId"],
-        roomState: RoomState.values.byName(doc["roomState"]),
-      );
-      availableRooms.add(room);
-    }
-    return availableRooms;
+        .where('roomState', whereIn: ["waiting", "playing", "ready"])
+        .snapshots()
+        .map((snapshot) {
+          List<Room> availableRooms = [];
+          for (final doc in snapshot.docs) {
+            final room = Room(
+              roomId: doc.id,
+              creatorName: doc["creatorName"],
+              creatorId: doc["creatorId"],
+              roomState: RoomState.values.byName(doc["roomState"]),
+            );
+            availableRooms.add(room);
+          }
+          return availableRooms;
+        });
   }
 
-  Stream<Room?> streamRoom(String roomId){
-    return _instance.collection("rooms").doc(roomId).snapshots()
-    .map((doc){
-
-      if(!doc.exists){
+  Stream<Room?> streamRoom(String roomId) {
+    return _instance.collection("rooms").doc(roomId).snapshots().map((doc) {
+      if (!doc.exists) {
         return null;
-        }
-        
-        return Room(
-       roomId: doc.id,
+      }
+
+      return Room(
+        roomId: doc.id,
         creatorName: doc["creatorName"],
         creatorId: doc["creatorId"],
         opponentName: doc["opponentName"],
         opponentId: doc["opponentId"],
         roomState: RoomState.values.byName(doc["roomState"]),
         xTurn: doc["xTurn"],
-        board: List<String> .from(doc["board"]),
+        board: List<String>.from(doc["board"]),
         winnerId: doc["winnerId"],
-        updateStat:doc["updateStat"],
-        turnStartAt:doc["turnStartAt"]
-
-        );
-        });
+        updateStat: doc["updateStat"],
+        turnStartAt: doc["turnStartAt"]??Timestamp.now(),
+      );
+    });
   }
 
-  Future<void> updateGame(String roomId ,bool xTurn , List<String> board) async{
-    try{
+  Future<void> updateGame(String roomId, bool xTurn, List<String> board) async {
+    try {
       await _instance.collection("rooms").doc(roomId).update({
-        "board":board,
-        "xTurn":xTurn,
-        "turnStartAt":Timestamp.now()
-        });
-    }
-    catch (e){
+        "board": board,
+        "xTurn": xTurn,
+        "turnStartAt": FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
       print(e);
     }
   }
-  Future<void> updateWinner(String roomId , String winnerId) async{
-    try{
+
+  Future<void> updateWinner(String roomId, String winnerId) async {
+    try {
       await _instance.collection("rooms").doc(roomId).update({
-        "winnerId":winnerId
+        "winnerId": winnerId,
       });
-    }
-    catch (e){
+    } catch (e) {
       print(e);
     }
   }
 
   Future<void> updateStat(String roomId) async {
-  try {
-    await _instance.collection("rooms").doc(roomId).update({
-      "updateStat": true,
-    });
-  } catch (e) {
-    print(e);
-  }
-}
-
-  Future<void> updateTurnStartAt(String roomId)async{
-    try{
-        await _instance.collection("rooms").doc(roomId).update({
-            "turnStartAt":Timestamp.now()
-        });
+    try {
+      await _instance.collection("rooms").doc(roomId).update({
+        "updateStat": true,
+      });
+    } catch (e) {
+      print(e);
     }
-    catch(e){
-        print(e);
+  }
+
+  Future<void> updateTurnStartAt(String roomId) async {
+    try {
+      await _instance.collection("rooms").doc(roomId).update({
+        "turnStartAt": FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteRoom(String roomId)async{
+    try {
+      await _instance.collection("rooms").doc(roomId).delete();
+    } catch (e) {
+      print(e);
     }
   }
 }

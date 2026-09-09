@@ -1,3 +1,4 @@
+import 'package:final_project/constants/colors.dart';
 import 'package:final_project/models/player.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/services/auth_service.dart';
@@ -13,7 +14,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-
   final AuthService _authservice = AuthService();
   final PlayerService _playerService = PlayerService();
 
@@ -61,31 +61,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return "Invalid email";
                         }
                         return null;
-
                       },
                       decoration: InputDecoration(
                         labelText: "Email",
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height:20),
+                    SizedBox(height: 20),
                     TextFormField(
                       controller: _userController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Please enter a username";
                         }
-                         if (value.length < 6) {
+                        if (value.length < 6) {
                           return "username is too short";
                         }
                         return null;
-                        
-                        },
+                      },
                       decoration: InputDecoration(
                         labelText: "Username",
-                        border: OutlineInputBorder()
+                        border: OutlineInputBorder(),
                       ),
-
                     ),
                     SizedBox(height: 20),
                     TextFormField(
@@ -100,7 +97,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return "Password must be at least 6 characters";
                         }
                         return null;
-
                       },
                       decoration: InputDecoration(
                         labelText: "Password",
@@ -128,24 +124,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             password: _passController.text,
                           );
 
-
-
-                          if(result != null){
-                           await _playerService.createUser(result.user!.uid, Player(username: _userController.text));
-                          Navigator.pushReplacementNamed(
-                          context,
-                          RouteName.homeRouteName,
-                        );}
+                          if (result != null) {
+                            await _playerService.createUser(
+                              result.user!.uid,
+                              Player(username: _userController.text),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Account created successfully!"),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                            Navigator.pushReplacementNamed(
+                              context,
+                              RouteName.homeRouteName,
+                            );
+                          }
                         }
-                        
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 255, 215, 0),
+                          myYellow,
                         ),
                       ),
                       child: SizedBox(
-                        width: 60,
+                        width: 80,
                         height: 50,
                         child: Center(
                           child: Text(
@@ -172,8 +176,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             "Login",
                             style: TextStyle(
                               decoration: TextDecoration.underline,
-                              decorationColor: Color.fromARGB(255, 255, 215, 0),
-                              color: Color.fromARGB(255, 255, 215, 0),
+                              decorationColor: myYellow,
+                              color: myYellow,
                             ),
                           ),
                         ),

@@ -1,3 +1,5 @@
+import 'package:final_project/constants/colors.dart';
+import 'package:final_project/main.dart';
 import 'package:final_project/models/player.dart';
 import 'package:final_project/models/room.dart';
 import 'package:final_project/routes/route_name.dart';
@@ -21,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Player? player;
 
-  Future<void> getPalyer() async {
+  Future<void> getPlayer() async {
     player = await _playerService.getUser(_authservice.getUid());
     setState(() {});
   }
@@ -29,17 +31,55 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getPalyer();
+    getPlayer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar:AppBar(
+        automaticallyImplyLeading: false,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 10,
+            backgroundColor: myPurple,
+            child: Text(player!.username.substring(0,2).toUpperCase()),
+          ),
+        ),
+        title: Text("Home",style: TextStyle(fontWeight: FontWeight.bold),),
+        actions: [
+
+          ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentMode, _) {
+    final isDark = currentMode == ThemeMode.dark;
+    return Row(
+      children: [
+        Icon(
+          Icons.light_mode,
+        ),
+        Switch(
+          value: isDark,
+          onChanged: (value) {
+            themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+          },
+        ),
+        Icon(
+          Icons.dark_mode,
+        ),
+      ],
+    );
+      },
+    ),
+        ],
+      ),
+      
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset("lib/assets/logo.svg", width: 300, height: 300),
+            SvgPicture.asset("lib/assets/logo.svg", width: 300, height: 300,),
             Container(
               margin: EdgeInsets.all(30),
               padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
@@ -131,14 +171,14 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
-        backgroundColor: Color.fromARGB(255, 255, 215, 0),
+        backgroundColor: myYellow,
         icon: IconButton(
           onPressed: () {},
-          icon: Icon(Icons.add, color: Color.fromARGB(255, 176, 38, 255)),
+          icon: Icon(Icons.add, color: myPurple),
         ),
         label: Text(
           "Create your own room",
-          style: TextStyle(color: Color.fromARGB(255, 176, 38, 255)),
+          style: TextStyle(color: myPurple),
         ),
       ),
     );

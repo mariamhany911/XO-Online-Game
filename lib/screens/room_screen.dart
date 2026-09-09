@@ -1,3 +1,5 @@
+import 'package:final_project/constants/colors.dart';
+import 'package:final_project/main.dart';
 import 'package:final_project/models/room.dart';
 import 'package:final_project/models/room_state_enum.dart';
 import 'package:final_project/routes/route_name.dart';
@@ -15,6 +17,7 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> {
   final RoomService _roomService = RoomService();
   final AuthService _authService = AuthService();
+  bool _navigatedToGame = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +32,34 @@ class _RoomScreenState extends State<RoomScreen> {
         if (snapshot.hasError) {
           return const Center(child: Text("Somethimg went wrong"));
         }
+        if(!snapshot.hasData){
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBar(content: Text("The room was cancelled"))
+            );
+            Navigator.pushNamedAndRemoveUntil(context, RouteName.availableRoomsRouteName, (route)=>false);
+          });
+          return Center(child: CircularProgressIndicator(),);
+        }
         if (snapshot.hasData) {
           final room = snapshot.data!;
           if (room.roomState == RoomState.playing &&
-              _authService.getUid() == room.opponentId) {
-            WidgetsBinding.instance.addPostFrameCallback((_){Navigator.pushNamed(
-              context,
-              RouteName.gameRouteName,
-              arguments: roomId,
-            );});
+              _authService.getUid() == room.opponentId &&!_navigatedToGame) {
+                _navigatedToGame=true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushNamed(
+                context,
+                RouteName.gameRouteName,
+                arguments: roomId,
+              );
+            });
+            
+          }
+          if (room.opponentId == null &&
+              _authService.getUid() != room.creatorId) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushNamed(context, RouteName.availableRoomsRouteName);
+            });
           }
           return Scaffold(
             appBar: AppBar(title: Text("Game Room")),
@@ -69,7 +91,7 @@ class _RoomScreenState extends State<RoomScreen> {
                             "X",
                             style: TextStyle(
                               fontSize: 60,
-                              color: Color.fromARGB(255, 176, 38, 255),
+                              color: myPurple,
                             ),
                           ),
                         ],
@@ -95,32 +117,125 @@ class _RoomScreenState extends State<RoomScreen> {
                             "O",
                             style: TextStyle(
                               fontSize: 60,
-                              color: Color.fromARGB(255, 255, 215, 0),
+                              color: myYellow,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  ElevatedButton(
-                    onPressed:
-                        _authService.getUid() == room.creatorId &&
-                            room.opponentId != null
-                        ? () async {
-                            await _roomService.updateRoomState(
-                              roomId,
-                              RoomState.playing,
-                            );
-                            Navigator.pushNamed(
-                              context,
-                              RouteName.gameRouteName,
-                              arguments: roomId,
-                            );
-                            await _roomService.updateTurnStartAt(roomId);
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(minimumSize: Size(200, 60)),
-                    child: Text("Start Game", style: TextStyle(fontSize: 30)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _authService.getUid() == room.creatorId
+                          ? Container(
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: room.opponentId != null
+                                            ? () async {
+                                                await _roomService
+                                                    .updateTurnStartAt(roomId);
+
+                                                await _roomService
+                                                    .updateRoomState(
+                                                      roomId,
+                                                      RoomState.playing,
+                                                    );
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  RouteName.gameRouteName,
+                                                  arguments: roomId,
+                                                );
+                                              }
+                                            : null,
+                                        child: Text(
+                                          "Start Game",
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: room.opponentId != null
+                                            ? () async {
+                                                await _roomService
+                                                    .updateOpponentId(
+                                                      roomId,
+                                                      null,
+                                                    );
+                                                await _roomService
+                                                    .updateOpponentName(
+                                                      roomId,
+                                                      null,
+                                                    );
+                                                await _roomService
+                                                    .updateRoomState(
+                                                      roomId,
+                                                      RoomState.waiting,
+                                                    );
+                                              }
+                                            : null,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+
+                                          children: [
+                                            Text(
+                                              "kick Player",
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                            Icon(Icons.person_remove),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await _roomService.deleteRoom(roomId);
+                                    },
+                                    child: Text("Cancle room"),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ElevatedButton(
+                              onPressed: () async {
+                                await _roomService.updateOpponentId(
+                                  roomId,
+                                  null,
+                                );
+                                await _roomService.updateOpponentName(
+                                  roomId,
+                                  null,
+                                );
+                                await _roomService.updateRoomState(
+                                  roomId,
+                                  RoomState.waiting,
+                                );
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.availableRoomsRouteName,
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+
+                                children: [
+                                  Text(
+                                    "Leave game",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  Icon(Icons.exit_to_app),
+                                ],
+                              ),
+                            ),
+                    ],
                   ),
                 ],
               ),
@@ -132,5 +247,3 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 }
-
-

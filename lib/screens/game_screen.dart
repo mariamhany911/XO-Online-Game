@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/constants/colors.dart';
 import 'package:final_project/models/room.dart';
 import 'package:final_project/models/room_state_enum.dart';
 import 'package:final_project/routes/route_name.dart';
@@ -80,6 +81,7 @@ class _GameScreenState extends State<GameScreen> {
     return null;
   }
 
+  bool _dialogShown = false;
   void showResultDialog(Room room) {
     showDialog(
       context: context,
@@ -124,8 +126,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> handleStatistics(Room room) async {
-    await updateStatistics(room);
     await _roomService.updateStat(room.roomId!);
+    await updateStatistics(room);
   }
 
   @override
@@ -135,25 +137,32 @@ class _GameScreenState extends State<GameScreen> {
     return StreamBuilder<Room?>(
       stream: _roomService.streamRoom(roomId),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return const Center(child: Text("Somethimg went wrong"));
+          return const Center(child: Text("Something went wrong"));
         }
         if (snapshot.hasData) {
           final room = snapshot.data!;
 
-          if (room.roomState == RoomState.finished) {
+          if (room.roomState == RoomState.finished && !_dialogShown) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               showResultDialog(room);
             });
+            _dialogShown = true;
           }
           if (room.roomState == RoomState.finished &&
               _authService.getUid() == room.creatorId &&
               !room.updateStat) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               handleStatistics(room);
+            });
+          }
+          if (room.opponentId == null &&
+              _authService.getUid() != room.creatorId) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushNamed(context, RouteName.availableRoomsRouteName);
             });
           }
           return Scaffold(
@@ -168,19 +177,39 @@ class _GameScreenState extends State<GameScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
-                        child: Row(children: [Text("kick"), Icon(Icons.login)]),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _authService.getUid() == room.opponentId
+                            ? () async {
+                                await _roomService.updateWinner(
+                                  roomId,
+                                  room.creatorId,
+                                );
+
+                                await _roomService.updateRoomState(
+                                  roomId,
+                                  RoomState.finished,
+                                );
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.homeRouteName,
+                                );
+                              }
+                            : () async {
+                                await _roomService.updateWinner(
+                                  roomId,
+                                  room.opponentId!,
+                                );
+
+                                await _roomService.updateRoomState(
+                                  roomId,
+                                  RoomState.finished,
+                                );
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.homeRouteName,
+                                );
+                              },
                         child: Row(
-                          children: [Text("leave"), Icon(Icons.login)],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          children: [Text("End game"), Icon(Icons.login)],
+                          children: [Text("Leave game"), Icon(Icons.login)],
                         ),
                       ),
                     ],
@@ -199,7 +228,7 @@ class _GameScreenState extends State<GameScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
-                        color: Color.fromARGB(255, 176, 38, 255),
+                        color: myPurple,
                       ),
                     ),
                     Text(
@@ -207,7 +236,7 @@ class _GameScreenState extends State<GameScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
-                        color: Color.fromARGB(255, 255, 215, 0),
+                        color: myYellow,
                       ),
                     ),
                   ],
@@ -245,7 +274,7 @@ class _GameScreenState extends State<GameScreen> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
+                            border: Border.all(color: Colors.grey),
                           ),
                           child: Center(
                             child: Text(
@@ -254,8 +283,8 @@ class _GameScreenState extends State<GameScreen> {
                                 fontSize: 50,
                                 fontWeight: FontWeight.bold,
                                 color: room.board[index] == "X"
-                                    ? Color.fromARGB(255, 176, 38, 255)
-                                    : Color.fromARGB(255, 255, 215, 0),
+                                    ? myPurple
+                                    : myYellow,
                               ),
                             ),
                           ),
@@ -330,14 +359,14 @@ class _CountdownTimerState extends State<CountdownTimer> {
   }
 
   async.Timer? _timer;
-  int remainingSeconds = 30;
+  int remainingSeconds = 15;
 
-  void countdown(Timestamp turnStartAt)  {
+  void countdown(Timestamp turnStartAt) {
     _timer?.cancel();
 
     _timer = async.Timer.periodic(Duration(seconds: 1), (timer) {
       final elapsed = Timestamp.now().seconds - turnStartAt.seconds;
-      final remaining = 30 - elapsed;
+      final remaining = 15 - elapsed;
 
       if (remaining > 0) {
         setState(() {
@@ -351,7 +380,6 @@ class _CountdownTimerState extends State<CountdownTimer> {
         if (widget.isMyTurn) {
           _roomService.updateGame(widget.roomId, !widget.xTurn, widget.board);
         }
-        
       }
     });
   }

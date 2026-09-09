@@ -1,3 +1,4 @@
+import 'package:final_project/constants/colors.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +101,13 @@ class _LogInScreenState extends State<LogInScreen> {
                           );
 
                           if(result != null){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Logged in , Welcome back!"),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
                           Navigator.pushReplacementNamed(
                           context,
                           RouteName.homeRouteName,
@@ -107,9 +115,6 @@ class _LogInScreenState extends State<LogInScreen> {
                         }
                         
                       },
-                            // style: ButtonStyle(
-                            //   backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 255, 215, 0))
-                            // ),
                            child: SizedBox(
                             width: 50,
                             height: 50,
@@ -129,8 +134,8 @@ class _LogInScreenState extends State<LogInScreen> {
                                   "Register",
                                style: TextStyle(
                                   decoration: TextDecoration.underline,
-                                  decorationColor: Color.fromARGB(255, 255, 215, 0),
-                                  color: Color.fromARGB(255, 255, 215, 0)
+                                  decorationColor: myYellow,
+                                  color: myYellow
                                ),
                                )),
                              ],

@@ -1,3 +1,4 @@
+import 'package:final_project/constants/colors.dart';
 import 'package:final_project/models/room_state_enum.dart';
 import 'package:final_project/routes/route_name.dart';
 import 'package:final_project/services/auth_service.dart';
@@ -29,7 +30,7 @@ class RoomCard extends StatelessWidget {
       width: MediaQuery.of(context).size.width / 3,
       height: MediaQuery.of(context).size.height / 3,
       child: Card(
-        color: Color.fromARGB(255, 176, 38, 255),
+        color: myPurple,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [

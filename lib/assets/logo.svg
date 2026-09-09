@@ -21,11 +21,13 @@
   </g>
 
   <!-- Clean Typography -->
-  <text x="150" y="245" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">
+  <text x="150" y="245" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#B026FF" text-anchor="middle" letter-spacing="4">
     EXO<tspan fill="#FFD700">MANIA</tspan>
   </text>
   
-  <text x="150" y="270" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="11" fill="#B026FF" text-anchor="middle" letter-spacing="6">
-    TIC TAC TOE
+  <text x="150" y="270" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11" fill="#B026FF" text-anchor="middle" letter-spacing="6">
+    <tspan fill="#B026FF">T</tspan><tspan fill="#4DA6FF">I</tspan><tspan fill="#FF4F9A">C</tspan>
+    <tspan fill="#FFD700">T</tspan><tspan fill="#FF8C42">A</tspan><tspan fill="#42D6C5">C</tspan>
+    <tspan fill="#B026FF">T</tspan><tspan fill="#4DA6FF">O</tspan><tspan fill="#FFD700">E</tspan>
   </text>
 </svg>

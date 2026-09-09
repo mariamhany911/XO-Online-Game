@@ -10,39 +10,44 @@ class AvailableRooms extends StatefulWidget {
   State<AvailableRooms> createState() => _AvailableRoomsState();
 }
 
-class _AvailableRoomsState extends State<AvailableRooms>  {
-
+class _AvailableRoomsState extends State<AvailableRooms> {
   final RoomService _roomService = RoomService();
-  List<Room> rooms =[];
-
-  Future<void> getRooms()async{
-    rooms = await  _roomService.getAvailableRooms();
-    setState(() {});
-  }
-  
-  @override
-  void initState() {
-    super.initState();
-    getRooms();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Available Rooms"),
+      appBar: AppBar(title: Text("Available Rooms")),
+      body: StreamBuilder<List<Room>>(
+        stream: _roomService.getAvailableRooms(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text("Something went wrong"));
+          }
+          if (snapshot.hasData) {
+            List<Room> rooms = snapshot.data!;
+            if (rooms.isEmpty) {
+              return const Center(child: Text("No available rooms"));
+            }
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemCount: rooms.length,
+              itemBuilder: (context, index) {
+                return RoomCard(
+                  creator: rooms[index].creatorName,
+                  state: rooms[index].roomState.name,
+                  roomId: rooms[index].roomId!,
+                );
+              },
+            );
+          }
+          return const Center(child: Text("Room not found"));
+        },
       ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2), 
-        itemCount: rooms.length,
-      itemBuilder: (context,index){
-        return RoomCard(
-          creator: rooms[index].creatorName,
-           state: rooms[index].roomState.name,
-           roomId: rooms[index].roomId!,
-           );
-      },
-      )
     );
   }
 }
