@@ -14,15 +14,18 @@ class LandingScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return const HomeScreen();
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
+        }
+         else if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             body: Center(child: const CircularProgressIndicator()),
           );
-        } else if (snapshot.hasError) {
+        } 
+        else if (snapshot.hasError) {
           return Scaffold(
             body: Center(child: Text("Error happend while authintication")),
           );
-        } else {
+        } 
+        else {
           return const LogInScreen();
         }
       },

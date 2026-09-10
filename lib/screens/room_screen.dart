@@ -37,14 +37,14 @@ class _RoomScreenState extends State<RoomScreen> {
             scaffoldMessengerKey.currentState?.showSnackBar(
               SnackBar(content: Text("The room was cancelled"))
             );
-            Navigator.pushNamedAndRemoveUntil(context, RouteName.availableRoomsRouteName, (route)=>false);
+            Navigator.pushNamedAndRemoveUntil(context, RouteName.homeRouteName, (route)=>false);
           });
           return Center(child: CircularProgressIndicator(),);
         }
         if (snapshot.hasData) {
           final room = snapshot.data!;
           if (room.roomState == RoomState.playing &&
-              _authService.getUid() == room.opponentId &&!_navigatedToGame) {
+              _authService.getUid() == room.opponentId && !_navigatedToGame) {
                 _navigatedToGame=true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushNamed(
@@ -106,7 +106,7 @@ class _RoomScreenState extends State<RoomScreen> {
                             ),
                           ),
                           Text(
-                            room.opponentName ?? "Waiting for the opponent",
+                            room.opponentName ?? "Waiting for the\n opponent",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -133,7 +133,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                        MainAxisAlignment.spaceBetween,
 
                                     children: [
                                       ElevatedButton(
@@ -147,7 +147,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                                       roomId,
                                                       RoomState.playing,
                                                     );
-                                                Navigator.pushNamed(
+                                                Navigator.pushReplacementNamed(
                                                   context,
                                                   RouteName.gameRouteName,
                                                   arguments: roomId,
@@ -198,7 +198,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                     onPressed: () async {
                                       await _roomService.deleteRoom(roomId);
                                     },
-                                    child: Text("Cancle room"),
+                                    child: Text("Cancle room",style: TextStyle(fontSize: 20),),
                                   ),
                                 ],
                               ),
@@ -224,7 +224,7 @@ class _RoomScreenState extends State<RoomScreen> {
                               },
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                    MainAxisAlignment.spaceBetween,
 
                                 children: [
                                   Text(

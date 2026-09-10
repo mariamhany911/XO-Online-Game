@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CircleAvatar(
             radius: 10,
             backgroundColor: myPurple,
-            child: Text(player!.username.substring(0,2).toUpperCase()),
+            child: player == null ? Center(child: CircularProgressIndicator(),): Text(player!.username.substring(0,2).toUpperCase()),
           ),
         ),
         title: Text("Home",style: TextStyle(fontWeight: FontWeight.bold),),
@@ -75,63 +75,65 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset("lib/assets/logo.svg", width: 300, height: 300,),
-            Container(
-              margin: EdgeInsets.all(30),
-              padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
-              height: MediaQuery.of(context).size.height * .35,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        RouteName.availableRoomsRouteName,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(80, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset("lib/assets/logo.svg", width: 300, height: 300,),
+              Container(
+                margin: EdgeInsets.all(30),
+                padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
+                child: Column(
+                  children: [
+                    SizedBox(height: 18),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          RouteName.availableRoomsRouteName,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(80, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
+                      child: Text("Join a room"),
                     ),
-                    child: Text("Join a room"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, RouteName.profileRouteName);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(80, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    SizedBox(height: 18),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, RouteName.profileRouteName);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(80, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
+                      child: Text("Profile"),
                     ),
-                    child: Text("Profile"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _authservice.logout();
-
-                      Navigator.pushNamed(context, RouteName.loginRouteName);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(80, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    SizedBox(height: 18),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _authservice.logout();        
+                        Navigator.pushNamed(context, RouteName.loginRouteName);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(80, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
+                      child: Text("Logout"),
                     ),
-                    child: Text("Logout"),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

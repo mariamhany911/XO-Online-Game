@@ -11,14 +11,14 @@
     </filter>
   </defs>
 
-  <!-- The "O" Element (Left) -->
-  <circle cx="110" cy="130" r="45" fill="none" stroke="#FFD700" stroke-width="16" stroke-linecap="round" filter="url(#glowGold)" />
-
-  <!-- The "X" Element (Right / Intersecting) -->
+  <!-- The "X" Element (Left) -->
   <g stroke="#B026FF" stroke-width="16" stroke-linecap="round" filter="url(#glowPurple)">
-    <line x1="150" y1="85" x2="230" y2="175" />
-    <line x1="230" y1="85" x2="150" y2="175" />
+    <line x1="70" y1="85" x2="150" y2="175" />
+    <line x1="150" y1="85" x2="70" y2="175" />
   </g>
+
+  <!-- The "O" Element (Right) -->
+  <circle cx="190" cy="130" r="45" fill="none" stroke="#FFD700" stroke-width="16" stroke-linecap="round" filter="url(#glowGold)" />
 
   <!-- Clean Typography -->
   <text x="150" y="245" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#B026FF" text-anchor="middle" letter-spacing="4">

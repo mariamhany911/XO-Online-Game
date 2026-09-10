@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/constants/colors.dart';
+import 'package:final_project/models/countdown_timer.dart';
 import 'package:final_project/models/room.dart';
 import 'package:final_project/models/room_state_enum.dart';
 import 'package:final_project/routes/route_name.dart';
@@ -7,7 +7,6 @@ import 'package:final_project/services/auth_service.dart';
 import 'package:final_project/services/player_service.dart';
 import 'package:final_project/services/room_service.dart';
 import 'package:flutter/material.dart';
-import 'dart:async' as async;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -166,56 +165,37 @@ class _GameScreenState extends State<GameScreen> {
             });
           }
           return Scaffold(
-            appBar: AppBar(),
-            drawer: Align(
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * .5,
-                height: MediaQuery.of(context).size.height * .2,
-                child: Drawer(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _authService.getUid() == room.opponentId
-                            ? () async {
-                                await _roomService.updateWinner(
-                                  roomId,
-                                  room.creatorId,
-                                );
-
-                                await _roomService.updateRoomState(
-                                  roomId,
-                                  RoomState.finished,
-                                );
-                                Navigator.pushNamed(
-                                  context,
-                                  RouteName.homeRouteName,
-                                );
-                              }
-                            : () async {
-                                await _roomService.updateWinner(
-                                  roomId,
-                                  room.opponentId!,
-                                );
-
-                                await _roomService.updateRoomState(
-                                  roomId,
-                                  RoomState.finished,
-                                );
-                                Navigator.pushNamed(
-                                  context,
-                                  RouteName.homeRouteName,
-                                );
-                              },
-                        child: Row(
-                          children: [Text("Leave game"), Icon(Icons.login)],
-                        ),
-                      ),
-                    ],
-                  ),
+            appBar: AppBar(
+              title: Text("XO Game"),
+              actions: [
+                TextButton.icon(
+                  onPressed: _authService.getUid() == room.opponentId
+                      ? () async {
+                          await _roomService.updateWinner(
+                            roomId,
+                            room.creatorId,
+                          );
+                          await _roomService.updateRoomState(
+                            roomId,
+                            RoomState.finished,
+                          );
+                          Navigator.pushNamed(context, RouteName.homeRouteName);
+                        }
+                      : () async {
+                          await _roomService.updateWinner(
+                            roomId,
+                            room.opponentId!,
+                          );
+                          await _roomService.updateRoomState(
+                            roomId,
+                            RoomState.finished,
+                          );
+                          Navigator.pushNamed(context, RouteName.homeRouteName);
+                        },
+                  icon: Icon(Icons.exit_to_app, color: Colors.grey),
+                  label: Text("Leave", style: TextStyle(color: Colors.grey)),
                 ),
-              ),
+              ],
             ),
             body: Column(
               children: [
@@ -299,10 +279,9 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(20),
-                  child: Container(
-                    width: 70,
-                    height: 70,
-                    color: Colors.red,
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundColor: const Color.fromARGB(144, 156, 45, 45),
                     child: Center(
                       child: CountdownTimer(
                         turnStartAt: room.turnStartAt!,
@@ -327,80 +306,3 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-class CountdownTimer extends StatefulWidget {
-  final Timestamp turnStartAt;
-  final String roomId;
-  final bool xTurn;
-  final List<String> board;
-  final bool isMyTurn;
-  const CountdownTimer({
-    super.key,
-    required this.turnStartAt,
-    required this.board,
-    required this.roomId,
-    required this.xTurn,
-    required this.isMyTurn,
-  });
-
-  @override
-  State<CountdownTimer> createState() => _CountdownTimerState();
-}
-
-class _CountdownTimerState extends State<CountdownTimer> {
-  final RoomService _roomService = RoomService();
-
-  @override
-  void didUpdateWidget(covariant CountdownTimer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.turnStartAt != widget.turnStartAt) {
-      countdown(widget.turnStartAt);
-    }
-  }
-
-  async.Timer? _timer;
-  int remainingSeconds = 15;
-
-  void countdown(Timestamp turnStartAt) {
-    _timer?.cancel();
-
-    _timer = async.Timer.periodic(Duration(seconds: 1), (timer) {
-      final elapsed = Timestamp.now().seconds - turnStartAt.seconds;
-      final remaining = 15 - elapsed;
-
-      if (remaining > 0) {
-        setState(() {
-          remainingSeconds = remaining;
-        });
-      } else {
-        setState(() {
-          remainingSeconds = 0;
-        });
-        _timer?.cancel();
-        if (widget.isMyTurn) {
-          _roomService.updateGame(widget.roomId, !widget.xTurn, widget.board);
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    countdown(widget.turnStartAt);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      "$remainingSeconds",
-      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-    );
-  }
-}
