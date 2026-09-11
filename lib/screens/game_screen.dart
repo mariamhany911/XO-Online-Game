@@ -81,6 +81,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   bool _dialogShown = false;
+  bool _statisticsUpdated = false;
   void showResultDialog(Room room) {
     showDialog(
       context: context,
@@ -153,7 +154,8 @@ class _GameScreenState extends State<GameScreen> {
           }
           if (room.roomState == RoomState.finished &&
               _authService.getUid() == room.creatorId &&
-              !room.updateStat) {
+              !room.updateStat && !_statisticsUpdated) {
+                _statisticsUpdated=true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               handleStatistics(room);
             });
