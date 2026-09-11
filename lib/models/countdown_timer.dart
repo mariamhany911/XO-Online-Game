@@ -41,8 +41,8 @@ class _CountdownTimerState extends State<CountdownTimer> {
     _timer?.cancel();
 
     _timer = async.Timer.periodic(Duration(seconds: 1), (timer) {
-      final elapsed = Timestamp.now().seconds - turnStartAt.seconds;
-      final remaining = 15 - elapsed;
+      final elapsed = Timestamp.now().toDate().difference(turnStartAt.toDate());
+      final remaining = 15 - elapsed.inSeconds;
 
       if (remaining > 0) {
         setState(() {

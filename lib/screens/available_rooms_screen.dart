@@ -39,8 +39,10 @@ class _AvailableRoomsState extends State<AvailableRooms> {
               itemBuilder: (context, index) {
                 return RoomCard(
                   creator: rooms[index].creatorName,
+                  creatorId: rooms[index].creatorId,
                   state: rooms[index].roomState.name,
                   roomId: rooms[index].roomId!,
+                  
                 );
               },
             );

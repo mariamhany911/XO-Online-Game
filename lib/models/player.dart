@@ -1,9 +1,9 @@
 class Player {
 
   final String username;
-  late final int wins;
-  late final int loses;
-  late final int draws;
+   final int wins;
+   final int loses;
+   final int draws;
 
   Player({
     required this.username,

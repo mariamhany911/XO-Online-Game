@@ -14,12 +14,14 @@ class RoomCard extends StatelessWidget {
 
 
   final String creator;
+  final String creatorId;
   final String state;
   final String roomId;
 
    RoomCard({
     super.key,
     required this.creator,
+    required this.creatorId,
     required this.state,
     required this.roomId,
   });
@@ -38,14 +40,14 @@ class RoomCard extends StatelessWidget {
             Text("Owner : $creator"),
             Text("Status of room : $state "),
             ElevatedButton(
-              onPressed: state=="waiting" ? () async{
+              onPressed: state=="waiting" && _authService.getUid()!=creatorId ? () async{
 
                 final opponentId = _authService.getUid();
                 final opponent = await _playerService.getUser(opponentId);
 
-                _roomService.updateOpponentId(roomId, opponentId);
-                _roomService.updateOpponentName(roomId, opponent!.username);
-                _roomService.updateRoomState(roomId,RoomState.ready);
+                await _roomService.updateOpponentId(roomId, opponentId);
+                await _roomService.updateOpponentName(roomId, opponent!.username);
+                await _roomService.updateRoomState(roomId,RoomState.ready);
 
                 Navigator.pushNamed(
                   context,

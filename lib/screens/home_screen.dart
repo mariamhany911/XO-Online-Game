@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CircleAvatar(
             radius: 10,
             backgroundColor: myPurple,
-            child: player == null ? Center(child: CircularProgressIndicator(),): Text(player!.username.substring(0,2).toUpperCase()),
+            child: player == null ? Center(child: CircularProgressIndicator(),): Text(player!.username.substring(0,2).toUpperCase(),style:TextStyle(color: Colors.black) ,),
           ),
         ),
         title: Text("Home",style: TextStyle(fontWeight: FontWeight.bold),),
@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Cancle"),
+                    child: Text("Cancel"),
                   ),
                   ElevatedButton(
                     onPressed: () async {

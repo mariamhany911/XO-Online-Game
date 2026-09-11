@@ -30,7 +30,7 @@ class _RoomScreenState extends State<RoomScreen> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return const Center(child: Text("Somethimg went wrong"));
+          return const Center(child: Text("Something went wrong"));
         }
         if(!snapshot.hasData){
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -198,7 +198,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                     onPressed: () async {
                                       await _roomService.deleteRoom(roomId);
                                     },
-                                    child: Text("Cancle room",style: TextStyle(fontSize: 20),),
+                                    child: Text("Cancel room",style: TextStyle(fontSize: 20),),
                                   ),
                                 ],
                               ),
